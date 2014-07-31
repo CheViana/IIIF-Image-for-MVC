@@ -122,6 +122,12 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Business\Processing\ColorProcessor.cs" />
+    <Compile Include="Business\Processing\CropProcessor.cs" />
+    <Compile Include="Business\Processing\FormatProcessor.cs" />
+    <Compile Include="Business\Processing\Quality.cs" />
+    <Compile Include="Business\Processing\RotateProcessor.cs" />
+    <Compile Include="Business\Processing\ScaleProcessor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
