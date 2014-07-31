@@ -1,9 +1,11 @@
 ﻿namespace IIIFImageMVC.Business.Processing
 {
-    public class FormatProcessor
+    public class FormatConvertor
     {
-        public string ConvertFormatToMime(string format)
+        public string ConvertFormatToMime(string colorformat)
         {
+            var parts = colorformat.Split(new []{'.'});
+            var format = parts[1];
             /*
                  * jpg	image/jpeg
                     tif	image/tiff
