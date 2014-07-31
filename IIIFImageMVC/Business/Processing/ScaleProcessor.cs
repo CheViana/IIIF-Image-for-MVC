@@ -7,19 +7,16 @@ namespace IIIFImageMVC.Business.Processing
     {
         public Image PercentageScaling(Bitmap image, int n)
         {
-            var width = (int)Math.Floor(image.Width * (n / 100.0));
-            var height = (int)Math.Floor(image.Height * (n / 100.0));
+            var width = (int) Math.Floor(image.Width * (n / 100.0));
+            var height = (int) Math.Floor(image.Height * (n / 100.0));
             return image.GetThumbnailImage(width, height, ThumbnailCallback, IntPtr.Zero);
         }
-
         public int ComputeHeight(int destWidth, int width, int height)
         {
             double realRatio = ((double)height) / ((double)width);
             var heightAfterRatio = (int)Math.Floor(realRatio * width);
             return heightAfterRatio;
         }
-
-
         public Image SizeScaling(Bitmap image, int width, int height, bool distorted)
         {
             try
@@ -49,11 +46,9 @@ namespace IIIFImageMVC.Business.Processing
                 return image;
             }
         }
-
         public static bool ThumbnailCallback()
         {
             return false;
         }
-
     }
 }
