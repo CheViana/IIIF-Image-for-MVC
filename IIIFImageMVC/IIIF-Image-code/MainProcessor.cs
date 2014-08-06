@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Drawing;
-using IIIFImageMVC.Business.Processing;
+using IIIFImageMVC.Processing;
 
-namespace IIIFImageMVC.Business
+namespace IIIFImageMVC
 {
     public class MainProcessor
     {
@@ -10,17 +10,19 @@ namespace IIIFImageMVC.Business
         {
             var cropProcessor = new CropProcessor();
             //full ?
-            if (region == "full") return (Bitmap)(im);
+            if (region == "full") return (Bitmap) (im);
 
             // percentage or coordinates cropp ?
-            var parts = region.Split(new[] { ',', ':' });
+            string[] parts = region.Split(new[] {',', ':'});
             // region=pct:10,10,80,80
             if (region.StartsWith("pct:"))
             {
-                return cropProcessor.PercentageCrop(im, int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]));
+                return cropProcessor.PercentageCrop(im, int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]),
+                    int.Parse(parts[4]));
             }
             // region=0,10,100,200
-            return cropProcessor.SizeCrop(im, int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]));
+            return cropProcessor.SizeCrop(im, int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]),
+                int.Parse(parts[3]));
         }
 
         public Image Scale(Bitmap bitmap, string size)
@@ -30,7 +32,7 @@ namespace IIIFImageMVC.Business
             if (size == "full") return bitmap;
 
             // percentage or coordinates scale ?                     
-            var parts = size.Split(new[] { ',', ':' });
+            string[] parts = size.Split(new[] {',', ':'});
             // size=pct:50
             if (size.StartsWith("pct:"))
             {
@@ -57,7 +59,7 @@ namespace IIIFImageMVC.Business
             string color = "";
             if (colorformat.Contains("."))
             {
-                var parts = colorformat.Split('.');
+                string[] parts = colorformat.Split('.');
                 if (!string.IsNullOrWhiteSpace(parts[0])) color = parts[0];
             }
             else
@@ -68,12 +70,12 @@ namespace IIIFImageMVC.Business
             var bitmap = new Bitmap(im);
             if (Math.Abs(rotate) > 0.0001)
             {
-                var rotatedImage = rotatedProcessor.RotateImg(bitmap, rotate);
+                Bitmap rotatedImage = rotatedProcessor.RotateImg(bitmap, rotate);
                 bitmap = rotatedImage;
             }
             if (!string.IsNullOrEmpty(color))
             {
-                var colorImage = colorProcessor.ChangeColor(bitmap, color);
+                Bitmap colorImage = colorProcessor.ChangeColor(bitmap, color);
                 bitmap = colorImage;
             }
             return bitmap;

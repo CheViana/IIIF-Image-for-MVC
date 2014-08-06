@@ -1,4 +1,4 @@
-﻿namespace IIIFImageMVC.Business.Processing
+﻿namespace IIIFImageMVC.Processing
 {
     public enum Quality
     {
@@ -7,5 +7,4 @@
         Grey,
         Bitonal
     }
-
 }

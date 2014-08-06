@@ -122,16 +122,16 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Business\ImageProvider.cs" />
-    <Compile Include="Business\ImageTilesAnalyzer.cs" />
-    <Compile Include="Business\MainProcessor.cs" />
-    <Compile Include="Business\PageTileInfo.cs" />
-    <Compile Include="Business\Processing\ColorProcessor.cs" />
-    <Compile Include="Business\Processing\CropProcessor.cs" />
-    <Compile Include="Business\Processing\FormatProcessor.cs" />
-    <Compile Include="Business\Processing\Quality.cs" />
-    <Compile Include="Business\Processing\RotateProcessor.cs" />
-    <Compile Include="Business\Processing\ScaleProcessor.cs" />
+    <Compile Include="IIIF-Image-code\ImageProvider.cs" />
+    <Compile Include="IIIF-Image-code\ImageTilesAnalyzer.cs" />
+    <Compile Include="IIIF-Image-code\MainProcessor.cs" />
+    <Compile Include="IIIF-Image-code\PageTileInfo.cs" />
+    <Compile Include="IIIF-Image-code\Processing\ColorProcessor.cs" />
+    <Compile Include="IIIF-Image-code\Processing\CropProcessor.cs" />
+    <Compile Include="IIIF-Image-code\Processing\FormatProcessor.cs" />
+    <Compile Include="IIIF-Image-code\Processing\Quality.cs" />
+    <Compile Include="IIIF-Image-code\Processing\RotateProcessor.cs" />
+    <Compile Include="IIIF-Image-code\Processing\ScaleProcessor.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Global.asax.cs">
@@ -212,7 +212,9 @@
     <Content Include="Scripts\knockout-2.1.0.js" />
     <Content Include="Scripts\modernizr-2.5.3.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

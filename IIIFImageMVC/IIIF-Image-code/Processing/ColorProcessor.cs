@@ -3,13 +3,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace IIIFImageMVC.Business.Processing
+namespace IIIFImageMVC.Processing
 {
     public class ColorProcessor
     {
         public Bitmap ChangeColor(Bitmap bitmap, string color)
         {
-            var colorValue = (Quality)Enum.Parse(typeof(Quality), color, true);
+            var colorValue = (Quality) Enum.Parse(typeof (Quality), color, true);
             switch (colorValue)
             {
                 case Quality.Grey:
@@ -22,9 +22,10 @@ namespace IIIFImageMVC.Business.Processing
                     return bitmap;
             }
         }
+
         public static Bitmap ConvertToRGB(Bitmap original)
         {
-            Bitmap newImage = new Bitmap(original.Width, original.Height, PixelFormat.Format24bppRgb);
+            var newImage = new Bitmap(original.Width, original.Height, PixelFormat.Format24bppRgb);
             newImage.SetResolution(original.HorizontalResolution, original.VerticalResolution);
             using (Graphics g = Graphics.FromImage(newImage))
             {
@@ -53,26 +54,29 @@ namespace IIIFImageMVC.Business.Processing
             }
 
             // Lock source bitmap in memory
-            BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height),
+                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             // Copy image data to binary array
-            int imageSize = sourceData.Stride * sourceData.Height;
-            byte[] sourceBuffer = new byte[imageSize];
+            int imageSize = sourceData.Stride*sourceData.Height;
+            var sourceBuffer = new byte[imageSize];
             Marshal.Copy(sourceData.Scan0, sourceBuffer, 0, imageSize);
 
             // Unlock source bitmap
             source.UnlockBits(sourceData);
 
             // Create destination bitmap
-            Bitmap destination = new Bitmap(source.Width, source.Height, PixelFormat.Format1bppIndexed);
+            var destination = new Bitmap(source.Width, source.Height, PixelFormat.Format1bppIndexed);
             destination.SetResolution(original.HorizontalResolution, original.VerticalResolution);
 
             // Lock destination bitmap in memory
-            BitmapData destinationData = destination.LockBits(new Rectangle(0, 0, destination.Width, destination.Height), ImageLockMode.WriteOnly, PixelFormat.Format1bppIndexed);
+            BitmapData destinationData = destination.LockBits(
+                new Rectangle(0, 0, destination.Width, destination.Height), ImageLockMode.WriteOnly,
+                PixelFormat.Format1bppIndexed);
 
             // Create destination buffer
-            imageSize = destinationData.Stride * destinationData.Height;
-            byte[] destinationBuffer = new byte[imageSize];
+            imageSize = destinationData.Stride*destinationData.Height;
+            var destinationBuffer = new byte[imageSize];
 
             int sourceIndex = 0;
             int destinationIndex = 0;
@@ -86,8 +90,8 @@ namespace IIIFImageMVC.Business.Processing
             // Iterate lines
             for (int y = 0; y < height; y++)
             {
-                sourceIndex = y * sourceData.Stride;
-                destinationIndex = y * destinationData.Stride;
+                sourceIndex = y*sourceData.Stride;
+                destinationIndex = y*destinationData.Stride;
                 destinationValue = 0;
                 pixelValue = 128;
 
@@ -96,10 +100,11 @@ namespace IIIFImageMVC.Business.Processing
                 {
                     // Compute pixel brightness (i.e. total of Red, Green, and Blue values) - Thanks murx
                     //                           B                             G                              R
-                    pixelTotal = sourceBuffer[sourceIndex] + sourceBuffer[sourceIndex + 1] + sourceBuffer[sourceIndex + 2];
+                    pixelTotal = sourceBuffer[sourceIndex] + sourceBuffer[sourceIndex + 1] +
+                                 sourceBuffer[sourceIndex + 2];
                     if (pixelTotal > threshold)
                     {
-                        destinationValue += (byte)pixelValue;
+                        destinationValue += (byte) pixelValue;
                     }
                     if (pixelValue == 1)
                     {
@@ -135,27 +140,28 @@ namespace IIIFImageMVC.Business.Processing
             // Return
             return destination;
         }
+
         public static Bitmap MakeGrayscale(Bitmap original)
         {
             //create a blank bitmap the same size as original
-            Bitmap newBitmap = new Bitmap(original.Width, original.Height);
+            var newBitmap = new Bitmap(original.Width, original.Height);
 
             //get a graphics object from the new image
             Graphics g = Graphics.FromImage(newBitmap);
 
             //create the grayscale ColorMatrix
-            ColorMatrix colorMatrix = new ColorMatrix(
-               new[]
-               {
-                   new[] {.3f, .3f, .3f, 0, 0},
-                   new[] {.59f, .59f, .59f, 0, 0},
-                   new[] {.11f, .11f, .11f, 0, 0},
-                   new float[] {0, 0, 0, 1, 0},
-                   new float[] {0, 0, 0, 0, 1}
-               });
+            var colorMatrix = new ColorMatrix(
+                new[]
+                {
+                    new[] {.3f, .3f, .3f, 0, 0},
+                    new[] {.59f, .59f, .59f, 0, 0},
+                    new[] {.11f, .11f, .11f, 0, 0},
+                    new float[] {0, 0, 0, 1, 0},
+                    new float[] {0, 0, 0, 0, 1}
+                });
 
             //create some image attributes
-            ImageAttributes attributes = new ImageAttributes();
+            var attributes = new ImageAttributes();
 
             //set the color matrix attribute
             attributes.SetColorMatrix(colorMatrix);
@@ -163,12 +169,11 @@ namespace IIIFImageMVC.Business.Processing
             //draw the original image on the new image
             //using the grayscale color matrix
             g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
-               0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+                0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
 
             //dispose the Graphics object
             g.Dispose();
             return newBitmap;
         }
-
     }
 }

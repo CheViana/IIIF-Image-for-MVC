@@ -3,8 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Web.Mvc;
-using IIIFImageMVC.Business;
-using IIIFImageMVC.Business.Processing;
+using IIIFImageMVC.Processing;
 
 namespace IIIFImageMVC.Controllers
 {
@@ -55,7 +54,5 @@ namespace IIIFImageMVC.Controllers
                     profile = "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2"
                 }, JsonRequestBehavior.AllowGet);
         }
-
-
     }
 }
