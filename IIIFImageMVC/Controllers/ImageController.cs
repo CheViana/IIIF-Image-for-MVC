@@ -14,7 +14,7 @@ namespace IIIFImageMVC.Controllers
         public ActionResult GetImageTile(string id, string region, string size, float rotation = 0, string colorformat = "native.jpg")
         {
             var imageFull = new ImageProvider().GetImage(id + ".jpg");
-            var formatProcessor = new FormatConvertor();
+            var formatConvertor = new FormatConvertor();
             var mainProc = new MainProcessor();
             Image imageReady;
             var croppedImage = mainProc.Crope(imageFull, region);
@@ -31,7 +31,7 @@ namespace IIIFImageMVC.Controllers
             {
                 imageReady.Save(memStream, ImageFormat.Jpeg);
                 var bytes = memStream.ToArray();
-                var mime = formatProcessor.ConvertFormatToMime(colorformat);
+                var mime = formatConvertor.ConvertFormatToMime(colorformat);
                 return File(bytes, mime);
             }
         }
