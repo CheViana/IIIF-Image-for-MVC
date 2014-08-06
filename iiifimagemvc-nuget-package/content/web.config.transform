@@ -1,0 +1,10 @@
+<configuration>
+  <appSettings>   
+    <add key="imagesFolderPath" value="C:\Images\"/>     
+  </appSettings>
+  <system.webServer>
+	  <handlers>
+	  <add name="ApiURIs-ISAPI-Integrated-4.0" path="/images/*" verb="GET,HEAD,POST,DEBUG,PUT,DELETE,PATCH,OPTIONS" type="System.Web.Handlers.TransferRequestHandler" preCondition="integratedMode,runtimeVersionv4.0" />
+	  </handlers>
+  </system.webServer>
+</configuration>

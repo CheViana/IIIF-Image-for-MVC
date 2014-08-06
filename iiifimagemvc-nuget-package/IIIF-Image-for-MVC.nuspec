@@ -9,9 +9,18 @@
     <projectUrl>https://github.com/CheViana/IIIF-Image-for-MVC</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/CheViana/IIIF-Image-for-MVC/master/iiifimagemvc-nuget-package/IIIF-Image-for-MVC-logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>IIIF Image API for MVC. For high resolution images from some folder provides access via IIIF Image API : http://iiif.io/ </description>
+    <description>
+        IIIF Image API for MVC. For high resolution images from some folder provides access via IIIF Image API : http://iiif.io/ .
+        Method that you should call inside your Application_Start() method in the global.asax.cs class: ImagesRouteConfig.RegisterRoutes(RouteTable.Routes);
+    </description>
     <tags>IIIF OpenSeaDragon HighResolutionImages</tags>
-    <dependencies>      
+    <dependencies>       
+            <dependency id="Microsoft.AspNet.Mvc" version="4.0.20710.0"/> 
+            <dependency id="Microsoft.AspNet.Providers.Core" version="1.1"/> 
+            <dependency id="Microsoft.AspNet.WebApi" version="4.0.20710.0"/> 
     </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Drawing" targetFramework="net45" />      
+    </frameworkAssemblies>    
   </metadata>
 </package>
