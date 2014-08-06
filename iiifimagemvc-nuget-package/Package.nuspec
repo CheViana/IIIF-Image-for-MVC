@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>IIIF-Image-for-MVC</id>
+    <version>1.0</version>
+    <authors>Ievgeniia Radetska</authors>
+    <owners>Ievgeniia Radetska</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/CheViana/IIIF-Image-for-MVC</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/CheViana/IIIF-Image-for-MVC/master/iiifimagemvc-nuget-package/IIIF-Image-for-MVC-logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>IIIF Image API for MVC. For high resolution images from some folder provides access via IIIF Image API : http://iiif.io/ </description>
+    <tags>IIIF OpenSeaDragon HighResolutionImages</tags>
+    <dependencies>      
+    </dependencies>
+  </metadata>
+</package>
