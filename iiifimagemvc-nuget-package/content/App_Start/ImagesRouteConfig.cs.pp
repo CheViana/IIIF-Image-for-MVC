@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
+
 namespace $rootnamespace$
 {
     public class ImagesRouteConfig

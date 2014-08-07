@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using IIIFImageMVC;
 using IIIFImageMVC.Processing;
 
+
 namespace $rootnamespace$.Controllers
 {
     public class ImageController : Controller
