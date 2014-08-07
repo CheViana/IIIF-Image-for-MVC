@@ -23,24 +23,26 @@ namespace IIIFImageMVC.Controllers
                             { "qualities", new[] { "native","greyscale" }},
                             { "profile", "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2"}
                         };
-        private MainProcessor mainProc = new MainProcessor();        
-        private ImageProvider imageProvider = new ImageProvider();  
+        private MainProcessor mainProcessor;        
+        private ImageProvider imageProvider;  
         private const string rootUrlForImages = "/images/";
         private const string defaultColorFormat = "native.jpg";
         private const int defaultRotation = 0;
-
-        public ImageController()
-        {            
+        
+        public ImageController(MainProcessor mainProc, ImageProvider imageProv)
+        {
+            mainProcessor = mainProc;
+            imageProvider = imageProv;
         }
 
         public ActionResult GetImageTile(string id, string region, string size, float rotation = defaultRotation, string colorformat = defaultColorFormat)
         {
             var imageFull = imageProvider.GetImage(id);
-            Bitmap imageReady = mainProc.GetImageTile(imageFull, region, size, rotation, colorformat);           
+            Bitmap imageReady = mainProcessor.GetImageTile(imageFull, region, size, rotation, colorformat);           
             using (var memStream = new MemoryStream())
             {                
                 imageReady.Save(memStream, ImageFormat.Jpeg);                
-                var mime = mainProc.FormatConvertor.ConvertFormatToMime(colorformat);
+                var mime = mainProcessor.FormatConvertor.ConvertFormatToMime(colorformat);
                 return File( memStream.ToArray(), mime);
             }
         } 

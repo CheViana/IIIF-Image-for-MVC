@@ -6,14 +6,24 @@ namespace IIIFImageMVC
 {
     public class MainProcessor
     {
-        private FormatConvertor formatConvertor = new FormatConvertor();
-        private RotateProcessor rotatedProcessor = new RotateProcessor();
-        private ColorProcessor colorProcessor = new ColorProcessor();
-        private CropProcessor cropProcessor = new CropProcessor();
-        private ScaleProcessor scaleProcessor = new ScaleProcessor();
-        private const string defaultColorFormat = "native.jpg"; 
+        private FormatConvertor formatConvertor;
+        private RotateProcessor rotatedProcessor;
+        private ColorProcessor colorProcessor;
+        private CropProcessor cropProcessor;
+        private ScaleProcessor scaleProcessor;
+
+        private const string defaultColorFormat = "native.jpg";
         private const string fullStr = "full";
-        private const string percentageStr = fullStr;
+        private const string percentageStr = "pct:";
+
+        public MainProcessor(FormatConvertor formatConv, RotateProcessor rotatedProc, ColorProcessor colorProc, CropProcessor cropProc, ScaleProcessor scaleProc)
+        {
+            formatConvertor = formatConv;
+            rotatedProcessor = rotatedProc;
+            colorProcessor = colorProc;
+            cropProcessor = cropProc;
+            scaleProcessor = scaleProc;
+        }        
         
         public FormatConvertor FormatConvertor
         {
