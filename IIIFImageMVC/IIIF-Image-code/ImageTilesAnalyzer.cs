@@ -7,6 +7,22 @@ namespace IIIFImageMVC
 {
     public class ImageTilesAnalyzer
     {
+        private ScaleProcessor scaleProcessor;
+        private CropProcessor cropProcessor;
+        private const int minPiece = 256;
+        public int MinPiece
+        {
+            get { return minPiece; }
+        } 
+
+        public ImageTilesAnalyzer(ScaleProcessor scaleProcessor, CropProcessor cropProcessor)
+        {
+            this.scaleProcessor = scaleProcessor;
+            this.cropProcessor = cropProcessor;
+        }
+
+        #region analyzing-for-tile-creation - dividing image to 4 same parts till parts are less than minPiece. not in use
+
         //filling in x-yoffset,width-height only
         public IEnumerable<PageTileInfo> AnalyzeImageForTileCreation(int width, int height)
         {
@@ -15,18 +31,63 @@ namespace IIIFImageMVC
                 //full tile
                 new PageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0}
             };
+            //recursive analysis - for each tile analyzise it's subtiles
             AnalyzeRec(tiles, width, height, 0, 0);
             return tiles;
         }
 
+        private void AnalyzeRec(ICollection<PageTileInfo> pageTiles, int width, int height, int x, int y)
+        {
+            if (width > minPiece & height > minPiece)
+            {
+                int width1 = width / 2;
+                int width2 = width - width1;
+                int height1 = height / 2;
+                int height2 = height - height1;
+                pageTiles.Add(new PageTileInfo
+                {
+                    IsFull = false,
+                    Width = width1,
+                    Height = height1,
+                    XOffset = x,
+                    YOffset = y
+                });
+                pageTiles.Add(new PageTileInfo
+                {
+                    IsFull = false,
+                    Width = width2,
+                    Height = height1,
+                    XOffset = x + width1,
+                    YOffset = y
+                });
+                pageTiles.Add(new PageTileInfo
+                {
+                    IsFull = false,
+                    Width = width1,
+                    Height = height2,
+                    XOffset = x,
+                    YOffset = y + height1
+                });
+                pageTiles.Add(new PageTileInfo
+                {
+                    IsFull = false,
+                    Width = width2,
+                    Height = height2,
+                    XOffset = x + width1,
+                    YOffset = y + height1
+                });
+                AnalyzeRec(pageTiles, width1, height1, x, y);
+                AnalyzeRec(pageTiles, width2, height1, x + width1, y);
+                AnalyzeRec(pageTiles, width1, height2, x, y + height1);
+                AnalyzeRec(pageTiles, width2, height2, x + width1, y + height1);
+            }
+        }
+        #endregion
+
         public IEnumerable<PageTileInfo> GenerateTilesInfo(int width, int height)
         {
-            var scaleProc = new ScaleProcessor();
-
             yield return //full tile
-                new PageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0};
-
-            const int minPiece = 256;
+                new PageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0};            
 
             //counting widthMain - it's < width, but minPiece can fit there int amount of times
             int widthMain = (width/minPiece)*minPiece;
@@ -37,15 +98,16 @@ namespace IIIFImageMVC
             {
                 for (int y = 0; y < heightMain; y += minPiece)
                 {
+                    //256x256
                     yield return new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece, Height = minPiece};
 
                     if (x%(minPiece*2) == 0 && y%(minPiece*2) == 0)
                     {
+                        //512x512
                         yield return
                             new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece*2, Height = minPiece*2};
 
-                        //adding scaled version too
-
+                        //512x512 scaled to 256x256
                         yield return
                             new PageTileInfo
                             {
@@ -58,12 +120,13 @@ namespace IIIFImageMVC
                             };
                     }
                     else continue;
-
+                    
                     if (x%(minPiece*4) == 0 && y%(minPiece*4) == 0)
                     {
+                        //1024x1024
                         yield return
                             new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece*4, Height = minPiece*4};
-                        //adding scaled version too - 512
+                        //1024x1024 scaled to - 512x512
                         yield return
                             new PageTileInfo
                             {
@@ -75,7 +138,7 @@ namespace IIIFImageMVC
                                 DestWidth = minPiece*2
                             };
 
-                        //adding scaled version too - 256
+                        //1024x1024 scaled to - 256x256
                         yield return
                             new PageTileInfo
                             {
@@ -124,55 +187,7 @@ namespace IIIFImageMVC
                         new PageTileInfo {XOffset = widthMain, YOffset = y, Width = diff, Height = minPiece};
                 }
             }
-        }
-
-        private void AnalyzeRec(ICollection<PageTileInfo> pageTiles, int width, int height, int x, int y)
-        {
-            const int minPiece = 256;
-            if (width > minPiece & height > minPiece)
-            {
-                int width1 = width/2;
-                int width2 = width - width1;
-                int height1 = height/2;
-                int height2 = height - height1;
-                pageTiles.Add(new PageTileInfo
-                {
-                    IsFull = false,
-                    Width = width1,
-                    Height = height1,
-                    XOffset = x,
-                    YOffset = y
-                });
-                pageTiles.Add(new PageTileInfo
-                {
-                    IsFull = false,
-                    Width = width2,
-                    Height = height1,
-                    XOffset = x + width1,
-                    YOffset = y
-                });
-                pageTiles.Add(new PageTileInfo
-                {
-                    IsFull = false,
-                    Width = width1,
-                    Height = height2,
-                    XOffset = x,
-                    YOffset = y + height1
-                });
-                pageTiles.Add(new PageTileInfo
-                {
-                    IsFull = false,
-                    Width = width2,
-                    Height = height2,
-                    XOffset = x + width1,
-                    YOffset = y + height1
-                });
-                AnalyzeRec(pageTiles, width1, height1, x, y);
-                AnalyzeRec(pageTiles, width2, height1, x + width1, y);
-                AnalyzeRec(pageTiles, width1, height2, x, y + height1);
-                AnalyzeRec(pageTiles, width2, height2, x + width1, y + height1);
-            }
-        }
+        }        
 
         public Tuple<PageTileInfo, string> LookForClosestTile(IEnumerable<PageTileInfo> allTiles, string region)
         {
@@ -204,7 +219,7 @@ namespace IIIFImageMVC
                     y + h <= pageTile.YOffset + pageTile.Height);
         }
 
-        private static void GetDimsInPx(string region, int width, int height, out int x, out int y, out int w, out int h)
+        private void GetDimsInPx(string region, int width, int height, out int x, out int y, out int w, out int h)
         {
             if (region == "full")
             {
@@ -221,10 +236,10 @@ namespace IIIFImageMVC
                 int yperc = int.Parse(regionParts[2]);
                 int wperc = int.Parse(regionParts[3]);
                 int hperc = int.Parse(regionParts[4]);
-                x = CropProcessor.OffsetFromPercToPx(width, xperc);
-                y = CropProcessor.OffsetFromPercToPx(height, yperc);
-                w = CropProcessor.DimentionFromPercToPx(width, wperc);
-                h = CropProcessor.DimentionFromPercToPx(height, hperc);
+                x = cropProcessor.OffsetFromPercToPx(width, xperc);
+                y = cropProcessor.OffsetFromPercToPx(height, yperc);
+                w = cropProcessor.DimentionFromPercToPx(width, wperc);
+                h = cropProcessor.DimentionFromPercToPx(height, hperc);
             }
             else
             {
@@ -234,7 +249,6 @@ namespace IIIFImageMVC
                 h = int.Parse(regionParts[3]);
             }
         }
-
 
         private string UpdateRegionRequestParam(PageTileInfo tile, string oldRegion, int width, int height)
         {

@@ -1,11 +1,12 @@
-﻿using System.Configuration;
+﻿using IIIFImageMVC.IIIF_Image_code;
+using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 
 namespace IIIFImageMVC
 {
-    public class ImageProvider
+    public class FileImageProvider : IImageProvider
     {
         public Image GetImage(string id)
         {

@@ -5,6 +5,7 @@ using System.IO;
 using System.Web.Mvc;
 using IIIFImageMVC.Processing;
 using System.Collections.Generic;
+using IIIFImageMVC.IIIF_Image_code;
 
 namespace IIIFImageMVC.Controllers
 {
@@ -24,12 +25,12 @@ namespace IIIFImageMVC.Controllers
                             { "profile", "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2"}
                         };
         private MainProcessor mainProcessor;        
-        private ImageProvider imageProvider;  
+        private IImageProvider imageProvider;  
         private const string rootUrlForImages = "/images/";
         private const string defaultColorFormat = "native.jpg";
         private const int defaultRotation = 0;
         
-        public ImageController(MainProcessor mainProc, ImageProvider imageProv)
+        public ImageController(MainProcessor mainProc, IImageProvider imageProv)
         {
             mainProcessor = mainProc;
             imageProvider = imageProv;

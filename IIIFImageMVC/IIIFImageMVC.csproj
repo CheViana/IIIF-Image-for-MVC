@@ -145,6 +145,7 @@
     <Compile Include="DependencyResolution\IoC.cs" />
     <Compile Include="DependencyResolution\StructureMapDependencyScope.cs" />
     <Compile Include="DependencyResolution\StructureMapScopeModule.cs" />
+    <Compile Include="IIIF-Image-code\IImageProvider.cs" />
     <Compile Include="IIIF-Image-code\ImageProvider.cs" />
     <Compile Include="IIIF-Image-code\ImageTilesAnalyzer.cs" />
     <Compile Include="IIIF-Image-code\MainProcessor.cs" />
