@@ -6,16 +6,37 @@ namespace IIIFImageMVC
 {
     public class MainProcessor
     {
-        public Bitmap Crope(Image im, string region)
+        private FormatConvertor formatConvertor = new FormatConvertor();
+        private RotateProcessor rotatedProcessor = new RotateProcessor();
+        private ColorProcessor colorProcessor = new ColorProcessor();
+        private CropProcessor cropProcessor = new CropProcessor();
+        private ScaleProcessor scaleProcessor = new ScaleProcessor();
+        private const string defaultColorFormat = "native.jpg"; 
+        private const string fullStr = "full";
+        private const string percentageStr = fullStr;
+        
+        public FormatConvertor FormatConvertor
         {
-            var cropProcessor = new CropProcessor();
+            get
+            {
+                return formatConvertor;
+            }
+        }
+        
+        public string DefaultColorFormat
+        {
+            get { return defaultColorFormat; }
+        }
+
+        private Bitmap Crope(Image im, string region)        
+        {
             //full ?
-            if (region == "full") return (Bitmap) (im);
+            if (region == fullStr) return (Bitmap)(im);
 
             // percentage or coordinates cropp ?
             string[] parts = region.Split(new[] {',', ':'});
             // region=pct:10,10,80,80
-            if (region.StartsWith("pct:"))
+            if (region.StartsWith(percentageStr))
             {
                 return cropProcessor.PercentageCrop(im, int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]),
                     int.Parse(parts[4]));
@@ -25,16 +46,15 @@ namespace IIIFImageMVC
                 int.Parse(parts[3]));
         }
 
-        public Image Scale(Bitmap bitmap, string size)
-        {
-            var scaleProcessor = new ScaleProcessor();
+        private Image Scale(Bitmap bitmap, string size)
+        {            
             //full ?
-            if (size == "full") return bitmap;
+            if (size == fullStr) return bitmap;
 
             // percentage or coordinates scale ?                     
             string[] parts = size.Split(new[] {',', ':'});
             // size=pct:50
-            if (size.StartsWith("pct:"))
+            if (size.StartsWith(percentageStr))
             {
                 return scaleProcessor.PercentageScaling(bitmap, int.Parse(parts[1]));
             }
@@ -52,33 +72,34 @@ namespace IIIFImageMVC
             return scaleProcessor.SizeScaling(bitmap, int.Parse(parts[0]), int.Parse(parts[1]), true);
         }
 
-        public Bitmap ColorRotateFormat(Image im, float rotate, string colorformat)
+        private Bitmap ColorRotate(Image im, float rotate, string colorformat)
         {
-            var rotatedProcessor = new RotateProcessor();
-            var colorProcessor = new ColorProcessor();
+            if (Math.Abs(rotate) < 0.1 && colorformat == defaultColorFormat)
+            {
+                return new Bitmap(im);
+            }            
             string color = "";
-            if (colorformat.Contains("."))
-            {
-                string[] parts = colorformat.Split('.');
-                if (!string.IsNullOrWhiteSpace(parts[0])) color = parts[0];
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(colorformat)) color = colorformat;
-            }
-
+            string[] parts = colorformat.Split('.');
+            color = parts[0];           
             var bitmap = new Bitmap(im);
-            if (Math.Abs(rotate) > 0.0001)
+            if (Math.Abs(rotate) > 0.1)
             {
-                Bitmap rotatedImage = rotatedProcessor.RotateImg(bitmap, rotate);
-                bitmap = rotatedImage;
+                bitmap = rotatedProcessor.RotateImg(bitmap, rotate);
             }
-            if (!string.IsNullOrEmpty(color))
+            if (!string.IsNullOrEmpty(color) && colorformat != defaultColorFormat)
             {
-                Bitmap colorImage = colorProcessor.ChangeColor(bitmap, color);
-                bitmap = colorImage;
+                bitmap = colorProcessor.ChangeColor(bitmap, color);
             }
             return bitmap;
         }
+
+        public Bitmap GetImageTile(Image imageFull, string region, string size, float rotation, string colorformat)
+        {
+            Bitmap croppedImage = Crope(imageFull, region);
+            Image scaledImage = Scale(croppedImage, size);
+            Bitmap imageReady = ColorRotate(scaledImage, rotation, colorformat);
+            return imageReady;
+        }
+        
     }
 }

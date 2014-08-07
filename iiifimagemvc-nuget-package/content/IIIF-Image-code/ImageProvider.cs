@@ -1,14 +1,17 @@
 ﻿using System.Configuration;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 
 namespace IIIFImageMVC
 {
     public class ImageProvider
     {
-        public Image GetImage(string filename)
+        public Image GetImage(string id)
         {
             string imagesPath = ConfigurationManager.AppSettings["imagesFolderPath"];
-            return Image.FromFile(imagesPath + filename);
+            var files = Directory.GetFiles(imagesPath,id+"*");            
+            return Image.FromFile(files.FirstOrDefault());
         }
     }
 }
