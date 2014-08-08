@@ -2,41 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using IIIFImageMVC.Processing;
+using IIIFImageMVC.Models;
 
 namespace IIIFImageMVC
 {
     public class ImageTilesAnalyzer
     {
-        private ScaleProcessor scaleProcessor;
-        private CropProcessor cropProcessor;
+        private readonly CropProcessor cropProcessor;
         private const int minPiece = 256;
         public int MinPiece
         {
             get { return minPiece; }
         } 
 
-        public ImageTilesAnalyzer(ScaleProcessor scaleProcessor, CropProcessor cropProcessor)
+        public ImageTilesAnalyzer(CropProcessor cropProcessor)
         {
-            this.scaleProcessor = scaleProcessor;
             this.cropProcessor = cropProcessor;
         }
 
         #region analyzing-for-tile-creation - dividing image to 4 same parts till parts are less than minPiece. not in use
 
         //filling in x-yoffset,width-height only
-        public IEnumerable<PageTileInfo> AnalyzeImageForTileCreation(int width, int height)
+        public IEnumerable<ImageTileInfo> AnalyzeImageForTileCreation(int width, int height)
         {
-            var tiles = new List<PageTileInfo>
+            var tiles = new List<ImageTileInfo>
             {
                 //full tile
-                new PageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0}
+                new ImageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0}
             };
             //recursive analysis - for each tile analyzise it's subtiles
             AnalyzeRec(tiles, width, height, 0, 0);
             return tiles;
         }
 
-        private void AnalyzeRec(ICollection<PageTileInfo> pageTiles, int width, int height, int x, int y)
+        private void AnalyzeRec(ICollection<ImageTileInfo> pageTiles, int width, int height, int x, int y)
         {
             if (width > minPiece & height > minPiece)
             {
@@ -44,7 +43,7 @@ namespace IIIFImageMVC
                 int width2 = width - width1;
                 int height1 = height / 2;
                 int height2 = height - height1;
-                pageTiles.Add(new PageTileInfo
+                pageTiles.Add(new ImageTileInfo
                 {
                     IsFull = false,
                     Width = width1,
@@ -52,7 +51,7 @@ namespace IIIFImageMVC
                     XOffset = x,
                     YOffset = y
                 });
-                pageTiles.Add(new PageTileInfo
+                pageTiles.Add(new ImageTileInfo
                 {
                     IsFull = false,
                     Width = width2,
@@ -60,7 +59,7 @@ namespace IIIFImageMVC
                     XOffset = x + width1,
                     YOffset = y
                 });
-                pageTiles.Add(new PageTileInfo
+                pageTiles.Add(new ImageTileInfo
                 {
                     IsFull = false,
                     Width = width1,
@@ -68,7 +67,7 @@ namespace IIIFImageMVC
                     XOffset = x,
                     YOffset = y + height1
                 });
-                pageTiles.Add(new PageTileInfo
+                pageTiles.Add(new ImageTileInfo
                 {
                     IsFull = false,
                     Width = width2,
@@ -84,10 +83,10 @@ namespace IIIFImageMVC
         }
         #endregion
 
-        public IEnumerable<PageTileInfo> GenerateTilesInfo(int width, int height)
+        public IEnumerable<ImageTileInfo> GenerateTilesInfo(int width, int height)
         {
             yield return //full tile
-                new PageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0};            
+                new ImageTileInfo {IsFull = true, Height = height, Width = width, XOffset = 0, YOffset = 0};            
 
             //counting widthMain - it's < width, but minPiece can fit there int amount of times
             int widthMain = (width/minPiece)*minPiece;
@@ -99,24 +98,24 @@ namespace IIIFImageMVC
                 for (int y = 0; y < heightMain; y += minPiece)
                 {
                     //256x256
-                    yield return new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece, Height = minPiece};
+                    yield return new ImageTileInfo {XOffset = x, YOffset = y, Width = minPiece, Height = minPiece};
 
                     if (x%(minPiece*2) == 0 && y%(minPiece*2) == 0)
                     {
                         //512x512
                         yield return
-                            new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece*2, Height = minPiece*2};
+                            new ImageTileInfo {XOffset = x, YOffset = y, Width = minPiece*2, Height = minPiece*2};
 
                         //512x512 scaled to 256x256
                         yield return
-                            new PageTileInfo
+                            new ImageTileInfo
                             {
                                 XOffset = x,
                                 YOffset = y,
                                 Width = minPiece*2,
                                 Height = minPiece*2,
                                 IsScaled = true,
-                                DestWidth = minPiece
+                                ScaledWidth = minPiece
                             };
                     }
                     else continue;
@@ -125,29 +124,29 @@ namespace IIIFImageMVC
                     {
                         //1024x1024
                         yield return
-                            new PageTileInfo {XOffset = x, YOffset = y, Width = minPiece*4, Height = minPiece*4};
+                            new ImageTileInfo {XOffset = x, YOffset = y, Width = minPiece*4, Height = minPiece*4};
                         //1024x1024 scaled to - 512x512
                         yield return
-                            new PageTileInfo
+                            new ImageTileInfo
                             {
                                 XOffset = x,
                                 YOffset = y,
                                 Width = minPiece*4,
                                 Height = minPiece*4,
                                 IsScaled = true,
-                                DestWidth = minPiece*2
+                                ScaledWidth = minPiece*2
                             };
 
                         //1024x1024 scaled to - 256x256
                         yield return
-                            new PageTileInfo
+                            new ImageTileInfo
                             {
                                 XOffset = x,
                                 YOffset = y,
                                 Width = minPiece*4,
                                 Height = minPiece*4,
                                 IsScaled = true,
-                                DestWidth = minPiece
+                                ScaledWidth = minPiece
                             };
                     }
                 }
@@ -159,7 +158,7 @@ namespace IIIFImageMVC
             if (heightMain != height && widthMain != width)
             {
                 yield return
-                    new PageTileInfo
+                    new ImageTileInfo
                     {
                         XOffset = widthMain,
                         YOffset = heightMain,
@@ -174,7 +173,7 @@ namespace IIIFImageMVC
                 for (int x = 0; x < widthMain; x += minPiece)
                 {
                     yield return
-                        new PageTileInfo {XOffset = x, YOffset = heightMain, Width = minPiece, Height = diff};
+                        new ImageTileInfo {XOffset = x, YOffset = heightMain, Width = minPiece, Height = diff};
                 }
             }
             //right side pieces
@@ -184,32 +183,32 @@ namespace IIIFImageMVC
                 for (int y = 0; y < heightMain; y += minPiece)
                 {
                     yield return
-                        new PageTileInfo {XOffset = widthMain, YOffset = y, Width = diff, Height = minPiece};
+                        new ImageTileInfo {XOffset = widthMain, YOffset = y, Width = diff, Height = minPiece};
                 }
             }
         }        
 
-        public Tuple<PageTileInfo, string> LookForClosestTile(IEnumerable<PageTileInfo> allTiles, string region)
+        public Tuple<ImageTileInfo, string> LookForClosestTile(IEnumerable<ImageTileInfo> allTiles, string region)
         {
-            if (region == "full") return new Tuple<PageTileInfo, string>(allTiles.First(t => t.IsFull), region);
+            if (region == "full") return new Tuple<ImageTileInfo, string>(allTiles.First(t => t.IsFull), region);
 
-            PageTileInfo[] tiles = allTiles.ToArray();
-            if (tiles.Count() == 1) return new Tuple<PageTileInfo, string>(tiles.ElementAt(0), region);
+            ImageTileInfo[] tiles = allTiles.ToArray();
+            if (tiles.Count() == 1) return new Tuple<ImageTileInfo, string>(tiles.ElementAt(0), region);
 
-            PageTileInfo fullTile = tiles.First(t => t.IsFull);
+            ImageTileInfo fullTile = tiles.First(t => t.IsFull);
 
             //looking for tiles that our region fits in
-            List<PageTileInfo> fittedTiles =
+            List<ImageTileInfo> fittedTiles =
                 tiles.Where(pageTile => RegionFitsInTile(pageTile, region, fullTile.Width, fullTile.Height)).ToList();
 
             //and then looking for smallest of them
             int smallestDims = fittedTiles.Min(t => t.Width*t.Height);
-            PageTileInfo smallestTile = fittedTiles.First(t => t.Width*t.Height == smallestDims);
+            ImageTileInfo smallestTile = fittedTiles.First(t => t.Width*t.Height == smallestDims);
             string newRegion = UpdateRegionRequestParam(smallestTile, region, fullTile.Width, fullTile.Height);
-            return new Tuple<PageTileInfo, string>(smallestTile, newRegion);
+            return new Tuple<ImageTileInfo, string>(smallestTile, newRegion);
         }
 
-        private bool RegionFitsInTile(PageTileInfo pageTile, string region, int width, int height)
+        private bool RegionFitsInTile(ImageTileInfo pageTile, string region, int width, int height)
         {
             int x, y, h, w;
             GetDimsInPx(region, width, height, out x, out y, out w, out h);
@@ -250,7 +249,7 @@ namespace IIIFImageMVC
             }
         }
 
-        private string UpdateRegionRequestParam(PageTileInfo tile, string oldRegion, int width, int height)
+        private string UpdateRegionRequestParam(ImageTileInfo tile, string oldRegion, int width, int height)
         {
             if (oldRegion == "full") return "full";
             int x, y, h, w;
@@ -266,30 +265,30 @@ namespace IIIFImageMVC
             return (x - tile.XOffset) + "," + (y - tile.YOffset) + "," + w + "," + h;
         }
 
-        public Tuple<PageTileInfo, string, string> LookForClosestTileScaled(IEnumerable<PageTileInfo> tiles,
+        public Tuple<ImageTileInfo, string, string> LookForClosestTileScaled(IEnumerable<ImageTileInfo> tiles,
             string region, int scalingWidth)
         {
-            PageTileInfo[] allTIles = tiles.ToArray();
-            PageTileInfo fullTile = allTIles.First(t => t.IsFull);
+            ImageTileInfo[] allTIles = tiles.ToArray();
+            ImageTileInfo fullTile = allTIles.First(t => t.IsFull);
 
             //looking for tiles that our region fits in
-            List<PageTileInfo> fittedTiles =
+            List<ImageTileInfo> fittedTiles =
                 allTIles.Where(pageTile => RegionFitsInTile(pageTile, region, fullTile.Width, fullTile.Height)).ToList();
             int x, y, w, h;
             GetDimsInPx(region, fullTile.Width, fullTile.Height, out x, out y, out w, out h);
-            PageTileInfo fittedTile =
+            ImageTileInfo fittedTile =
                 fittedTiles.FirstOrDefault(
                     ft =>
-                        ft.IsScaled & ft.DestWidth == scalingWidth && ft.XOffset == x && ft.YOffset == y &&
+                        ft.IsScaled & ft.ScaledWidth == scalingWidth && ft.XOffset == x && ft.YOffset == y &&
                         ft.Width == w && ft.Height == h);
 
             if (fittedTile.Width != 0)
             {
-                return new Tuple<PageTileInfo, string, string>(fittedTile,
+                return new Tuple<ImageTileInfo, string, string>(fittedTile,
                     UpdateRegionRequestParam(fittedTile, region, fittedTile.Width, fittedTile.Height), "0,");
             }
-            Tuple<PageTileInfo, string> tuple = LookForClosestTile(allTIles, region);
-            return new Tuple<PageTileInfo, string, string>(tuple.Item1, tuple.Item2, scalingWidth + ",");
+            Tuple<ImageTileInfo, string> tuple = LookForClosestTile(allTIles, region);
+            return new Tuple<ImageTileInfo, string, string>(tuple.Item1, tuple.Item2, scalingWidth + ",");
         }
     }
 }

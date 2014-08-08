@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Web.Mvc;
-using IIIFImageMVC.Processing;
+using IIIFImageMVC.DB;
 using System.Collections.Generic;
-using IIIFImageMVC.IIIF_Image_code;
 
 namespace IIIFImageMVC.Controllers
 {
     public class ImageController : Controller
     {
-        private Dictionary<string, object> infoTemplate = new Dictionary<string, object>()
+        private readonly Dictionary<string, object> infoTemplate = new Dictionary<string, object>()
                         { 
                             { "@context", "http://library.stanford.edu/iiif/image-api/1.1/context.json" },
                             { "@id", "" },
@@ -24,37 +22,37 @@ namespace IIIFImageMVC.Controllers
                             { "qualities", new[] { "native","greyscale" }},
                             { "profile", "http://library.stanford.edu/iiif/image-api/1.1/compliance.html#level2"}
                         };
-        private MainProcessor mainProcessor;        
-        private IImageProvider imageProvider;  
+        private readonly MainProcessor mainProcessor;
+        private readonly IImageProviderWithCaching imageProvider;  
         private const string rootUrlForImages = "/images/";
         private const string defaultColorFormat = "native.jpg";
         private const int defaultRotation = 0;
         
-        public ImageController(MainProcessor mainProc, IImageProvider imageProv)
+        public ImageController(MainProcessor mainProc, IImageProviderWithCaching imageProv)
         {
             mainProcessor = mainProc;
             imageProvider = imageProv;
         }
 
-        public ActionResult GetImageTile(string id, string region, string size, float rotation = defaultRotation, string colorformat = defaultColorFormat)
+        public FileContentResult GetImageTile(string id, string region, string size, float rotation = defaultRotation, string colorformat = defaultColorFormat)
         {
-            var imageFull = imageProvider.GetImage(id);
-            Bitmap imageReady = mainProcessor.GetImageTile(imageFull, region, size, rotation, colorformat);           
+            var imageFull = imageProvider.GetImageTileCached(id, region, size);
+            var imageReady = mainProcessor.GetImageTile(imageFull.Item1, imageFull.Item2, imageFull.Item3, rotation, colorformat);           
             using (var memStream = new MemoryStream())
             {                
                 imageReady.Save(memStream, ImageFormat.Jpeg);                
                 var mime = mainProcessor.FormatConvertor.ConvertFormatToMime(colorformat);
-                return File( memStream.ToArray(), mime);
+                return File(memStream.ToArray(), mime);
             }
         } 
  
         public JsonResult Info(string id)
         {
-            var image = imageProvider.GetImage(id);
+            var imageInfo = imageProvider.GetFullImageInfo(id);
             var ourInfo = new Dictionary<string,object>(infoTemplate);
             ourInfo["@id"] = HttpContext.Request.Url.GetLeftPart(UriPartial.Authority) + rootUrlForImages + id;
-            ourInfo["width"] = image.Width;
-            ourInfo["height"] = image.Height;
+            ourInfo["width"] = imageInfo.Width;
+            ourInfo["height"] = imageInfo.Height;
             return Json(ourInfo, JsonRequestBehavior.AllowGet);
         }
     }

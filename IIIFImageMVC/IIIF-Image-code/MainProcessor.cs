@@ -103,13 +103,16 @@ namespace IIIFImageMVC
             return bitmap;
         }
 
-        public Bitmap GetImageTile(Image imageFull, string region, string size, float rotation, string colorformat)
+        public Image GetImageTile(Image imageFull, string region, string size, float rotation, string colorformat)
         {
+            if (region == "full" && (size == "full" || size == "0,") && Math.Abs(rotation) < 0.1 && colorformat == defaultColorFormat)
+            {
+                return imageFull;
+            }
             Bitmap croppedImage = Crope(imageFull, region);
             Image scaledImage = Scale(croppedImage, size);
             Bitmap imageReady = ColorRotate(scaledImage, rotation, colorformat);
             return imageReady;
-        }
-        
+        }        
     }
 }

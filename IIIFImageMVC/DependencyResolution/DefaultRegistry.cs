@@ -15,6 +15,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using IIIFImageMVC.DB;
+
 namespace IIIFImageMVC.DependencyResolution {
     using StructureMap.Configuration.DSL;
     using StructureMap.Graph;
@@ -28,7 +30,7 @@ namespace IIIFImageMVC.DependencyResolution {
                     scan.TheCallingAssembly();
                     scan.WithDefaultConventions();
                 });
-            //For<IExample>().Use<Example>();
+            For<IImageProviderWithCaching>().Use<DbImageProvider>();
         }
 
         #endregion
